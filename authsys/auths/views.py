@@ -131,6 +131,12 @@ def adminpd(request):
         return redirect('login')
     
     q=Product.objects.all()
+
+    
+    if request.GET.get('q'):
+        q=q.filter(name__icontains=request.GET.get('q'))
+
+
     context={'products':q}
     return render(request, 'admin_pd.html', context)
 
