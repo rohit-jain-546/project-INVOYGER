@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        padding: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #2c5f5d;
+        color: #ffffff;
+    }
+
+    th, td {
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+    }
+
+    th {
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    td img {
+        border-radius: 6px;
+        object-fit: cover;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+</style>
+
+</head>
+<body>
+    <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Tax Percent</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Image</th>
+            <th>action</th>
+        </tr>
+    </thead>
+    
+
+
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td scope="row">{{ forloop.counter }}</td>
+            <td>{{ product.name }}</td>
+            <td>₹{{ product.price }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.taxpercent }}</td>
+            <td>{{ product.stock }}</td>
+            <td>{{ product.is_active|yesno:"Active,Inactive" }}</td>
+            <td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="100"></td>
+            <td><a href="{% url 'delete_product' product.id %}" class="btn btn-danger">delete</a></td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+<a href="{% url 'logout' %}">Logout</a>
+      <a href="{% url 'adminpd' %}">Product Details</a>
+</body>
+</html>

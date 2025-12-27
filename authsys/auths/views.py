@@ -1,11 +1,8 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
-from requests import request
-from auths.models import Customer , AdminUser
+from auths.models import *
 from django.contrib import messages
 
 
@@ -24,7 +21,30 @@ def user_home(request):
 def admin_home(request):
     if not AdminUser.objects.filter(user=request.user).exists():
         return redirect('login') 
+    
+    if request.method == "POST":
+        product_name = request.POST.get("product_name")
+        description = request.POST.get("description")
+        price = request.POST.get("price")
+        taxpercent = request.POST.get("taxpercent")
+        stock = request.POST.get("stock")
+        is_active = request.POST.get("is_active") == 'on'
+        image = request.FILES.get("image")
 
+        
+
+        Product.objects.create(
+            name=product_name,
+            description=description,
+            price=price,
+            taxpercent=taxpercent,
+            stock=stock,
+            is_active=is_active,
+            image=image
+        )
+
+        messages.success(request, "Product added successfully")
+        return redirect('admin_home')
     return render(request, 'adhome.html')
 
 
@@ -105,4 +125,25 @@ def logout_p(request):
     messages.success(request, "You have been logged out")
     return redirect('login')
 
+@login_required(login_url='/login/')
+def adminpd(request):
+    if not AdminUser.objects.filter(user=request.user).exists():
+        return redirect('login')
+    
+    q=Product.objects.all()
+    context={'products':q}
+    return render(request, 'admin_pd.html', context)
+
+def delete_product(request, product_id):
+    if not AdminUser.objects.filter(user=request.user).exists():
+        return redirect('login')
+    
+    try:
+        product = Product.objects.get(id=product_id)
+        product.delete()
+        messages.success(request, "Product deleted successfully")
+    except Product.DoesNotExist:
+        messages.error(request, "Product does not exist")
+    
+    return redirect('adminpd')
 # Create your views here.
