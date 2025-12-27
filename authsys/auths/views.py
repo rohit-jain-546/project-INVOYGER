@@ -147,3 +147,31 @@ def delete_product(request, product_id):
     
     return redirect('adminpd')
 # Create your views here.
+
+def update_product(request, product_id):
+    if not AdminUser.objects.filter(user=request.user).exists():
+        return redirect('login')
+    
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        messages.error(request, "Product does not exist")
+        return redirect('adminpd')
+
+    if request.method == "POST":
+        product.name = request.POST.get("product_name")
+        product.description = request.POST.get("description")
+        product.price = request.POST.get("price")
+        product.taxpercent = request.POST.get("taxpercent")
+        product.stock = request.POST.get("stock")
+        product.is_active = request.POST.get("is_active") == 'on'
+        
+        if 'image' in request.FILES:
+            product.image = request.FILES.get("image")
+
+        product.save()
+        messages.success(request, "Product updated successfully")
+        return redirect('adminpd')
+
+    context = {'product': product}
+    return render(request, 'update_product.html', context)

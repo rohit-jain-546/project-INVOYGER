@@ -81,13 +81,14 @@
             <td>{{ product.stock }}</td>
             <td>{{ product.is_active|yesno:"Active,Inactive" }}</td>
             <td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="100"></td>
-            <td><a href="{% url 'delete_product' product.id %}" class="btn btn-danger">delete</a></td>
+            <td><a href="{% url 'delete_product' product.id %}" class="btn btn-danger">delete</a>
+            <a href="{% url 'update_product' product.id %}" class="btn btn-success">update</a></td>
         </tr>
         {% endfor %}
 
     </tbody>
 </table>
 <a href="{% url 'logout' %}">Logout</a>
-      <a href="{% url 'adminpd' %}">Product Details</a>
+      <a href="{% url 'admin_home' %}">Add Product</a>
 </body>
 </html>

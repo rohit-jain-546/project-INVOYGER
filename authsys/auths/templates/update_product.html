@@ -31,7 +31,7 @@
 
   <div class="page">
     <div class="form-card">
-      <h1>Add New Product</h1>
+        <h1'>Update Product</h1>
       {% if messages %}
       {% for message in messages %}
       <div class="message {{ message.tags }}">
@@ -44,29 +44,29 @@
         <div class="row">
           <div class="field">
             <label>Product Name</label>
-            <input type="text" name="product_name" placeholder="Enter product name" required>
+            <input type="text" name="product_name" value="{{ product.name }}" placeholder="Enter product name" required>
           </div>
 
           <div class="field">
             <label>Price</label>
-            <input type="number" name="price" step="0.01" placeholder="₹0.00" required>
+            <input type="number" name="price" step="0.01" value="{{ product.price }}" placeholder="₹0.00" required>
           </div>
         </div>
 
         <div class="field">
           <label>Description</label>
-          <textarea rows="3" name="description" placeholder="Product description"></textarea>
+          <textarea rows="3" name="description" placeholder="Product description">{{ product.description }}</textarea>
         </div>
 
         <div class="row">
           <div class="field">
             <label>Tax Percentage</label>
-            <input type="number" name="taxpercent" step="0.01" placeholder="e.g. 18">
+            <input type="number" name="taxpercent" step="0.01" value="{{ product.taxpercent }}" placeholder="e.g. 18">
           </div>
 
           <div class="field">
             <label>Stock</label>
-            <input type="number" name="stock" placeholder="Available quantity">
+            <input type="number" name="stock" value="{{ product.stock }}" placeholder="Available quantity">
           </div>
         </div>
 
