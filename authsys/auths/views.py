@@ -11,8 +11,10 @@ from django.contrib import messages
 def user_home(request):
     if not Customer.objects.filter(user=request.user).exists():
         return redirect('login')
+    q=Product.objects.all()
+    context={'products':q}
 
-    return render(request, 'home.html')
+    return render(request, 'home.html', context)
 
 
 
