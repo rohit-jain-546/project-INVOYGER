@@ -16,7 +16,7 @@
         <ul class="nav-links">
             <li><a href="#">Home</a></li>
             <li><a href="#">Products</a></li>
-            <li><a href="#">Cart</a></li>
+            <li><a href="{% url 'cart' %}">Cart</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
     </nav>
@@ -31,7 +31,7 @@
                 <h3>{{ product.name }}</h3>
                 <p>₹{{ product.price }}</p>
                 <p>{{ product.description }}</p>
-                <button>Add to Cart</button>
+                <button><a href="{% url 'cart' %}">Add to Cart</a></button>
             </div>
 {% endfor %}
            

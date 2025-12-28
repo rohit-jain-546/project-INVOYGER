@@ -11,3 +11,5 @@ def user_home(request):
     context={'products':q}
 
     return render(request, 'shop/home.html', context)
+def cart_view(request):
+    return render(request, 'shop/cart.html')
