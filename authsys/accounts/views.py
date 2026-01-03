@@ -61,7 +61,7 @@ def login_p(request):
         if role == "user":
             if Customer.objects.filter(user=user).exists():
                 login(request, user)
-                return redirect("user_home")
+                return redirect("shop:user_home")
             else:
                 messages.error(request, "You are not registered as a user")
                 return redirect("login")

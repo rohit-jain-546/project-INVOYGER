@@ -36,12 +36,12 @@ def add_to_cart(request, product_id):
     if not created:
         cart_item.quantity +=1
         cart_item.save()
-    return redirect('cart_view')    
+    return redirect('shop:cart_view')    
 
 def remove_from_cart(request, item_id):
     cart_item=get_object_or_404(cartitem, id=item_id, cart__user=request.user)
     cart_item.delete()
-    return redirect('cart_view')
+    return redirect('shop:cart_view')
 
 def update_cart_item(request, item_id):
     if request.method == "POST":
@@ -49,5 +49,5 @@ def update_cart_item(request, item_id):
         quantity = int(request.POST.get("quantity", 1))
         item.quantity = quantity
         item.save()    
-    return redirect('cart_view')
+    return redirect('shop:cart_view')
 

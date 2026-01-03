@@ -24,7 +24,13 @@ urlpatterns = [
     # path('', include('auths.urls')),
     path('', include('accounts.urls')),
     path('adminpanel/', include('adminpanel.urls')),
-    path('shop/', include('shop.urls')),
+    # path('shop/', include('shop.urls')),
+    path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
+    path('shop/', include(('shop.urls', 'shop'), namespace='shop')),
+    # path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
+
+
+
 ]
 if settings.DEBUG:
     
