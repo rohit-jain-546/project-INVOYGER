@@ -2,17 +2,23 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
-from accounts.models import AdminUser
+from accounts.models import AdminUser , Customer
 from orders.pdf import generate_invoice
 from .models import Product
 from django.contrib import messages
 from orders.models import Order
+from django.core.paginator import Paginator
+
+
+from django.db.models import Sum
+
 
 @login_required(login_url='/login/')
 def admin_home(request):
     if not AdminUser.objects.filter(user=request.user).exists():
-        return redirect('login') 
-    
+        return redirect('login')
+
+    # ---------- POST: add product ----------
     if request.method == "POST":
         product_name = request.POST.get("product_name")
         description = request.POST.get("description")
@@ -21,8 +27,6 @@ def admin_home(request):
         stock = request.POST.get("stock")
         is_active = request.POST.get("is_active") == 'on'
         image = request.FILES.get("image")
-
-        
 
         Product.objects.create(
             name=product_name,
@@ -36,21 +40,41 @@ def admin_home(request):
 
         messages.success(request, "Product added successfully")
         return redirect('adminpanel:admin_home')
-    return render(request, 'adminpanel/adhome.html')
-@login_required(login_url='/login/')
-def adminpd(request):
-    if not AdminUser.objects.filter(user=request.user).exists():
-        return redirect('login')
-    
-    q=Product.objects.all()
+
+    # ---------- ALWAYS build dashboard data ----------
+    all_products = Product.objects.all()
+    orders = Order.objects.all()
+
+    total_products = all_products.count()
+    total_orders = orders.count()
+    total_revenue = orders.aggregate(total=Sum('total_amount'))['total'] or 0
+    total_customers = Customer.objects.count()
+
+    recent_orders = orders.order_by('-created_at')[:5]
+    low_stock_products = all_products.filter(stock__lte=5)
+
+    query = request.GET.get("q")
+    if query:
+        all_products = all_products.filter(name__icontains=query)
+    paginator = Paginator(all_products, 5)  # 5 products per page
+    page_number = request.GET.get("page")
+    products = paginator.get_page(page_number)
 
     
-    if request.GET.get('q'):
-        q=q.filter(name__icontains=request.GET.get('q'))
 
+    context = {
+        'products': products,
+        'total_products': total_products,
+        'total_orders': total_orders,
+        'total_revenue': total_revenue,
+        'total_customers': total_customers,
+        'recent_orders': recent_orders,
+        'low_stock_products': low_stock_products,
+    }
 
-    context={'products':q}
-    return render(request, 'adminpanel/admin_pd.html', context)
+    return render(request, 'adminpanel/adhome.html', context)
+ 
+
 
 def delete_product(request, product_id):
     if not AdminUser.objects.filter(user=request.user).exists():
@@ -63,7 +87,7 @@ def delete_product(request, product_id):
     except Product.DoesNotExist:
         messages.error(request, "Product does not exist")
     
-    return redirect('adminpanel:adminpd')
+    return redirect('adminpanel:admin_home')
 # Create your views here.
 
 def update_product(request, product_id):
@@ -89,7 +113,7 @@ def update_product(request, product_id):
 
         product.save()
         messages.success(request, "Product updated successfully")
-        return redirect('adminpanel:adminpd')
+        return redirect('adminpanel:admin_home')
 
     context = {'product': product}
     return render(request, 'adminpanel/update_product.html', context)
