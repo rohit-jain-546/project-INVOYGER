@@ -1,376 +1,123 @@
+# INVOYGER
+
+![Django](https://img.shields.io/badge/Django-6.x-0C4B33?logo=django&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
+![Status](https://img.shields.io/badge/Project-Active-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+Role-based Django online marketplace with separate customer/admin workflows, cart + checkout pipeline, order lifecycle, and downloadable PDF invoices.
+
+## Why This Project Stands Out
+
+- Built as a modular multi-app Django architecture, not a single monolith
+- Real marketplace flow: browse -> cart -> checkout -> order -> invoice
+- Role-based authorization with dedicated dashboards
+- Invoice PDFs generated server-side using ReportLab
+- Clean foundation for scaling into production (payments, shipping, analytics)
+
+## Demo Screens
+
+Add your screenshots at these exact paths to render automatically:
+
+![Public Home](docs/images/public-home.png)
+![Customer Home](docs/images/customer-home.png)
+![Cart](docs/images/cart.png)
+![Order Summary](docs/images/order-summary.png)
+![Admin Dashboard](docs/images/admin-dashboard.png)
+![Admin Orders](docs/images/admin-orders.png)
 
+## Features
 
-🧾 INVOYGER
+- Authentication + role profiles (`Customer`, `AdminUser`)
+- Product CRUD with image upload, stock, active/inactive status
+- Category filtering (Men, Women, Kids, Accessories, Universal)
+- Persistent cart and quantity updates
+- Checkout that snapshots product data into order items
+- Admin order management and status updates
+- PDF invoice download for customer and admin
 
-Invoice Billing & Product Management System (Django)
+## Tech Stack
 
-Invoyger is a role-based invoice billing and product management web application built using Django.
-The system provides separate workflows for administrators and customers, enabling secure authentication, product management, cart handling, and invoice-ready billing architecture.
+- Python, Django 6
+- SQLite (dev DB)
+- Django Templates + HTML/CSS
+- ReportLab (PDF generation)
+- Pillow (image support)
 
-This project follows clean multi-app Django architecture, proper role separation, and scalable backend design principles.
+## Architecture
 
+```text
+authsys/
+|-- manage.py
+|-- authsys/         # settings, root urls, wsgi/asgi
+|-- accounts/        # auth + role models
+|-- adminpanel/      # admin dashboard, product/order controls
+|-- shop/            # storefront, categories, cart
+|-- orders/          # checkout, order success, invoice pdf
+|-- static/
+`-- media/
+```
 
----
+## Data Model (Core)
 
-🚀 Features
+- `Product`: catalog item with price, stock, category, image, active status
+- `cart` + `cartitem`: user cart persistence and quantities
+- `Order`: generated `order_id`, status, total, timestamps
+- `OrderItem`: immutable snapshot (`product_name`, `price`, `quantity`, `line_total`)
+- `Customer` / `AdminUser`: role profiles linked to `User`
 
-🔐 Authentication & Roles
+## Local Setup
 
-User and Admin registration
+```bash
+git clone <your-repo-url>
+cd authsys
+python -m venv .venv
+```
 
-Secure login & logout using Django Auth
+Windows (PowerShell):
 
-Role-based access control
+```bash
+.venv\Scripts\Activate.ps1
+```
 
-Unauthorized route protection
+Install deps and run:
 
+```bash
+pip install django reportlab pillow
+python manage.py migrate
+python manage.py runserver
+```
 
+App URL: `http://127.0.0.1:8000/`
 
----
+## Main Routes
 
-🛠️ Admin Panel
+- `/` public home
+- `/signup/`, `/login/`, `/logout/`
+- `/shop/`, `/shop/cart/`
+- `/orders/checkout/`
+- `/orders/order-success/<order_id>/`
+- `/orders/invoice/<order_id>/`
+- `/adminpanel/`
+- `/adminpanel/orders/`
 
-Admin-only access
+## Production Notes
 
-Add products
+- `DEBUG=True` and `ALLOWED_HOSTS=['*']` are development settings
+- Admin signup code in `accounts/views.py` is hardcoded; move to env var
+- Use PostgreSQL/MySQL + proper secrets management for deployment
 
-Update products
+## Roadmap
 
-Delete products
+- Add `requirements.txt` with pinned versions
+- Add automated tests for checkout + role access
+- Add CI pipeline (lint + tests)
+- Integrate payment gateway and shipping updates
+- Harden security settings and deployment config
 
-View all products
+## Author
 
-Search products
+Rohit Jain  
+LinkedIn: https://www.linkedin.com/in/546-rohit-jain
 
-Activate / deactivate products
-
-Image upload support
-
-
-(Planned Enhancements)
-
-Accept orders
-
-Reject orders
-
-Mark orders as completed
-
-View and download invoices
-
-Search invoices by invoice number
-
-
-
----
-
-🛒 Customer (Shop)
-
-View available products
-
-Product price with tax calculation
-
-Database-based cart system
-
-Checkout-ready architecture
-
-
-(Planned Enhancements)
-
-Invoice generation after checkout
-
-Invoice history
-
-Search invoices
-
-Download invoices (PDF)
-
-
-
----
-
-📄 Invoice & Billing System
-
-Unique invoice number generation
-
-Permanent invoice storage
-
-Invoice item snapshot (product name, price, tax at purchase time)
-
-Accurate tax-inclusive billing
-
-
-(Upcoming)
-
-PDF invoice generation using ReportLab
-
-Download invoice option for both admin and customer
-
-
-
----
-
-🧱 Tech Stack
-
-Layer	Technology
-
-Backend	Python, Django
-Database	SQLite (development)
-Frontend	HTML, CSS (Django Templates)
-Authentication	Django Auth
-Cart System	Database-based
-File Handling	Django Media
-Version Control	Git, GitHub
-
-
-
----
-
-🗂️ Project Structure
-
-project-invoyger/
-└── authsys/
-    ├── manage.py
-    ├── invoyger/            # Project configuration
-    │   ├── settings.py
-    │   ├── urls.py
-    │   ├── wsgi.py
-    │   └── asgi.py
-    ├── accounts/            # Authentication & roles
-    ├── adminpanel/          # Admin operations
-    ├── shop/                # Products, cart, invoices
-    ├── templates/
-    ├── static/
-    ├── media/
-    └── db.sqlite3
-
-
----
-
-📦 App Responsibilities
-
-accounts
-
-User registration
-
-Admin registration
-
-Login & logout
-
-Role verification
-
-
-Models
-
-Customer
-
-AdminUser
-
-
-
----
-
-👨🏻‍💼adminpanel
-
-Product CRUD operations
-
-Product search
-
-Product activation control
-
-Admin-only route protection
-
-
-
----
-
-🛍️shop
-
-Product display for users
-
-Database-based cart
-
-Invoice & invoice items
-
-Billing logic
-
-
-Models
-
-Product
-
-Cart
-
-CartItem
-
-Invoice
-
-InvoiceItem
-
-
-
----
-
-🧮 Database Design Highlights
-
-Product
-
-Name
-
-Description
-
-Price
-
-Tax percentage
-
-Stock
-
-Active status
-
-Image
-
-
-
----
-
-🛒Cart (Database-Based)
-
-One cart per user
-
-Persistent until checkout
-
-Supports quantity updates
-
-Cleared after invoice generation
-
-
-
----
-
-🧾Invoice
-
-Auto-generated unique invoice number
-
-Linked to user
-
-Immutable billing record
-
-Stores total amount
-
-
-
----
-
-🧾InvoiceItem
-
-Stores product snapshot
-
-Preserves billing accuracy even if product data changes later
-
-
-
----
-
-🔒 Security & Best Practices
-
-Django authentication system
-
-Role-based access decorators
-
-Secure session handling
-
-No sensitive data stored in sessions
-
-Clean app separation
-
-Warning-free configuration
-
-
-
----
-
-🧪 Current Project Status
-
-✅ Completed
-
-Multi-app Django refactor
-
-Authentication system
-
-Admin product CRUD
-
-Role-based access control
-
-Product listing
-
-Cart & invoice database design
-
-Media & static file handling
-
-Git version control with clean commits
-
-
-
----
-
-🔜 Planned Features
-
-Checkout workflow
-
-Invoice creation from cart
-
-PDF invoice generation (ReportLab)
-
-Invoice search (Admin & Customer)
-
-Invoice download
-
-Admin order lifecycle management
-
-Accept
-
-Reject
-
-Complete orders
-
-
-Deployment-ready configuration
-
-
-
----
-
-📚 Learning Outcomes
-
-Django multi-app architecture
-
-Secure authentication & authorization
-
-Database modeling for billing systems
-
-Cart & invoice design
-
-Backend scalability concepts
-
-Git & GitHub workflow
-
-Debugging and refactoring skills
-
-
-
----
-
-📌 Conclusion
-
-Invoyger is a structured Django project that demonstrates real-world backend concepts, including authentication, role-based access, product management, and invoice billing system design.
-The project is scalable, maintainable, and ready for advanced features like PDF billing and order management.
-
-
----
-
-🧑‍💻 Author
-
-Rohit Jain
-
-Linked in- https://www.linkedin.com/in/546-rohit-jain 
-
-Aspiring Backend / Full-Stack Developer
