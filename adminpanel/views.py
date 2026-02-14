@@ -125,8 +125,16 @@ def update_product(request, product_id):
 def admin_orders(request):
     if not AdminUser.objects.filter(user=request.user).exists():
         return redirect('login')
-    
-    orders = Order.objects.all().order_by('-created_at')
+    q = request.GET.get("q")
+    orders = Order.objects.all()
+    if q:   
+        orders = orders.filter(
+            order_id__icontains=q
+        ) | orders.filter(
+            user__username__icontains=q
+        )
+       
+    orders = orders.order_by('-created_at')
     context = {'orders': orders}
     return render(request, 'adminpanel/admin_orders.html', context)
 

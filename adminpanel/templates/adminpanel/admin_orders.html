@@ -1,114 +1,342 @@
-<!DOCTYPE html>
+{% load static %}
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Orders</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f6fa;
-            padding: 30px;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Orders · Retailer Dashboard · VibeCart</title>
 
-        h2 {
-            margin-bottom: 20px;
-        }
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
+    <link rel="stylesheet" href="{% static 'css/oradmin.css' %}" />
+  </head>
 
-        th {
-            background: #2f3640;
-            color: white;
-        }
+  <body>
+    <header>
+      <nav class="navbar flex container">
+        <a href="{% url 'adminpanel:admin_home' %}" class="logo">
+          Vibe<span>Cart.</span>
+          <span class="retailer-badge">Retailer</span>
+        </a>
 
-        tr:hover {
-            background: #f1f2f6;
-        }
+        <ul class="navlist flex">
+          <li>
+            <a href="{% url 'adminpanel:admin_home' %}" class="link"
+              >DASHBOARD</a
+            >
+          </li>
+          <li><a href="#" class="link">PRODUCTS</a></li>
+          <li>
+            <a
+              href="{% url 'adminpanel:admin_orders' %}"
+              class="link link-active"
+              >ORDERS</a
+            >
+          </li>
+          <li><a href="#" class="link">CUSTOMERS</a></li>
+        </ul>
 
-        .status {
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+        <div class="nav-icons flex">
+          <a href="#" class="icon">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notification-badge">8</span>
+          </a>
 
-        .pending { background: #ffeaa7; }
-        .processing { background: #74b9ff; color: white; }
-        .shipped { background: #55efc4; }
-        .delivered { background: #00b894; color: white; }
-        .cancelled { background: #ff7675; color: white; }
+          <div class="user-profile-dropdown">
+            <a href="#" class="icon user-profile">
+              <i class="fa-solid fa-store"></i>
+            </a>
 
-        a.view-btn {
-            text-decoration: none;
-            background: #0984e3;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-        }
+            <div class="dropdown-menu">
+              <div class="dropdown-header">
+                <div class="user-info">
+                  <span class="user-name">Retailer Store</span>
+                  <span class="user-email">{{ request.user.email }}</span>
+                </div>
+              </div>
 
-        a.view-btn:hover {
-            background: #0652DD;
-        }
-    </style>
-</head>
-<body>
+              <div class="dropdown-divider"></div>
 
-<h2>All Orders</h2>
+              <a href="#" class="dropdown-item">
+                <i class="fas fa-user-circle"></i> Profile
+              </a>
 
-<table>
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>User</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>View</th>
-        </tr>
-    </thead>
+              <a href="#" class="dropdown-item">
+                <i class="fas fa-cog"></i> Settings
+              </a>
 
-    <tbody>
-        {% for order in orders %}
-        <tr>
-            <td>#{{ order.order_id }}</td>
-            <td>{{ order.user.username }}</td>
-            <td>₹{{ order.total_amount }}</td>
+              <div class="dropdown-divider"></div>
 
-            <td>
-          <span class="status {{ order.status|lower }}">
-    {{ order.get_status_display }}
-</span>
+              <a href="{% url 'logout' %}" class="dropdown-item logout-item">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
 
+        <a href="#" class="hamburger">
+          <i class="fa-solid fa-bars"></i>
+        </a>
+      </nav>
+    </header>
 
-            </td>
+    <main class="orders-section">
+      <div class="orders-container">
+        <div class="page-header">
+          <div class="header-left">
+            <h1 class="page-title">
+              <i class="fas fa-shopping-bag"></i>
+              Manage Orders
+            </h1>
+            <p class="page-subtitle">View and manage all customer orders</p>
+          </div>
+          <form method="GET" class="header-actions" style="display:flex; gap:12px;">
 
-            <td>{{ order.created_at }}</td>
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input
+      type="text"
+      name="q"
+      placeholder="Search orders..."
+      value="{{ request.GET.q }}"
+    >
+  </div>
 
-            <td>
-              <a href="{% url 'adminpanel:admin_order_detail' order.id %}" class="view-btn">
-    View
-</a>
+  <button type="submit" class="btn btn-outline">
+    <i class="fas fa-search"></i>
+  </button>
 
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6">No orders found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+</form>
 
-</body>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-tabs">
+            <button class="filter-tab active">All Orders</button>
+            <button class="filter-tab">Pending</button>
+            <button class="filter-tab">Processing</button>
+            <button class="filter-tab">Confirmed</button>
+            <button class="filter-tab">Completed</button>
+            <button class="filter-tab">Cancelled</button>
+          </div>
+
+          <div class="filter-date">
+            <select class="date-filter">
+              <option>All Time</option>
+              <option>Today</option>
+              <option>This Week</option>
+              <option>This Month</option>
+              <option>This Year</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Orders Summary -->
+        <div class="orders-summary">
+          <div class="summary-card">
+            <div class="summary-icon total">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Total Orders</span>
+              <span class="summary-value">156</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Pending</span>
+              <span class="summary-value">23</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon processing">
+              <i class="fas fa-spinner"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Processing</span>
+              <span class="summary-value">31</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon confirmed">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Confirmed</span>
+              <span class="summary-value">42</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon completed">
+              <i class="fas fa-check-double"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Completed</span>
+              <span class="summary-value">48</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-icon cancelled">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="summary-content">
+              <span class="summary-label">Cancelled</span>
+              <span class="summary-value">12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- static analytics cards kept unchanged -->
+
+        <div class="orders-table-card">
+          <div class="table-header">
+            <h3><i class="fas fa-list"></i> All Orders</h3>
+            <span class="table-info">Live order data</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name</th>
+                  <th>Total Price</th>
+                  <th>Status</th>
+                  <th>Order Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td class="order-id-cell">
+                    <span class="order-id">#{{ order.order_id }}</span>
+                  </td>
+
+                  <td class="customer-cell">{{ order.user.username }}</td>
+
+                  <td class="price-cell">₹{{ order.total_amount }}</td>
+
+                  <td class="status-cell">
+                    <span class="status-badge {{ order.status|lower }}">
+                      {{ order.get_status_display }}
+                    </span>
+                  </td>
+
+                  <td class="date-cell">
+                    {{ order.created_at|date:"M d, Y" }}
+                  </td>
+
+                  <td class="action-cell">
+                    <a
+                      href="{% url 'adminpanel:admin_order_detail' order.id %}"
+                      class="view-link"
+                    >
+                      <i class="fas fa-eye"></i> View
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 40px">
+                    No orders found
+                  </td>
+                </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <a href="{% url 'shop:user_home' %}" class="logo"
+              >Vibe<span>Cart.</span></a
+            >
+            <p>
+              Your premier shopping destination for trendy and unique products.
+            </p>
+
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-pinterest"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">FAQs</a></li>
+              <li><a href="#">Shipping Policy</a></li>
+              <li><a href="#">Returns & Exchanges</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-links">
+            <h4>Customer Service</h4>
+            <ul>
+              <li><a href="#">My Account</a></li>
+              <li><a href="#">Order Tracking</a></li>
+              <li><a href="#">Wishlist</a></li>
+              <li><a href="#">Customer Support</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h4>Contact Info</h4>
+            <p>
+              <i class="fas fa-map-marker-alt"></i> 123 Fashion Street, New
+              York, NY 10001
+            </p>
+            <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+            <p><i class="fas fa-envelope"></i> support@vibecart.com</p>
+
+            <div class="payment-methods">
+              <i class="fab fa-cc-visa"></i>
+              <i class="fab fa-cc-mastercard"></i>
+              <i class="fab fa-cc-amex"></i>
+              <i class="fab fa-cc-paypal"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            &copy; 2026 VibeCart. All rights reserved. | Designed with
+            <i class="fas fa-heart" style="color: var(--primary-clr)"></i>
+            for fashion lovers
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>
