@@ -1,16 +1,451 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Order Summary · VibeCart</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/invocust.css' %}">
 </head>
 <body>
-    <h2>Order Placed Successfully</h2>
-<p>Order ID: {{ order.order_id }}</p>
-<p>Status: {{ order.status }}</p>
-<p>Total: ₹{{ order.total_amount }}</p>
-<a href="{% url 'orders:invoice_pdf' order.order_id %}">Download Invoice</a>
+    
+    <!-- ===== FIXED HEADER / NAVBAR ===== -->
+    <header>
+        <nav class="navbar flex container">
+            <a href="{% url 'shop:user_home' %}" class="logo">
+                Vibe<span>Cart.</span>
+            </a>
+            
+            <ul class="navlist flex">
+                <li><a href="{% url 'shop:user_home' %}" class="link">HOME</a></li>
+                <li><a href="{% url 'shop:products_view' %}" class="link">SHOP</a></li>
+                <li><a href="#" class="link link-active">ORDERS</a></li>
+                <li><a href="#" class="link">CONTACT</a></li>
+            </ul>
+            
+            <div class="nav-icons flex">
+                <a href="#" class="icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </a>
+                <a href="#" class="icon">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+                <a href="{% url 'shop:cart_view' %}" class="icon cart-icon"> 
+                    <i class="fa-solid fa-shopping-bag"></i>
+                    <span class="cart-badge">{{ order.items.count }}</span>
+                </a>
+            </div>
+            
+            <a href="#" class="hamburger">
+                <i class="fa-solid fa-bars"></i>
+            </a>
+        </nav>
+    </header>
+    <!-- ===== HEADER END ===== -->
 
+    <!-- ===== MAIN ORDER SUMMARY SECTION ===== -->
+    <main class="order-section">
+        <div class="order-container">
+            
+            <!-- Breadcrumb Navigation -->
+            <div class="breadcrumb">
+                <a href="{% url 'shop:user_home' %}"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#">My Orders</a>
+                <i class="fas fa-chevron-right"></i>
+                <span class="current">Order #{{ order.order_id }}</span>
+            </div>
+            
+            <!-- Page Header with Download Button -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Order Summary
+                    </h1>
+                    <p class="order-id-display">Order #{{ order.order_id }}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/orders/invoice/{{ order.order_id }}/" class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                        Download Invoice PDF
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Order Summary Grid - Two Columns -->
+            <div class="order-grid">
+                
+                <!-- ===== LEFT COLUMN - ORDER DETAILS ===== -->
+                <div class="order-details-card">
+                    
+                    <!-- Order Status Card with Dropdown -->
+                    <div class="info-card status-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-truck"></i> Order Status</h3>
+                            <span class="order-date">
+                                <i class="far fa-calendar-alt"></i> 
+                                {{ order.created_at }}
+                            </span>
+                        </div>
+                        
+                        <!-- Status Timeline -->
+                        <div class="status-timeline">
+                            <!-- Order Placed -->
+                            <div class="status-step completed">
+                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Order Placed</span>
+                                    <span class="step-date">{{ order.created_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Confirmed -->
+                            {% if order.payment_confirmed_at %}
+                            <div class="status-step completed">
+                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Payment Confirmed</span>
+                                    <span class="step-date">{{ order.payment_confirmed_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="status-step {% if order.status == 'PENDING' %}active{% else %}pending{% endif %}">
+                                <div class="step-icon"><i class="fas fa-clock"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Payment Confirmed</span>
+                                    <span class="step-date">Pending</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Processing -->
+                            {% if order.processing_at %}
+                            <div class="status-step {% if order.status == 'PROCESSING' %}active{% else %}completed{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'PROCESSING' %}cog{% else %}check{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Processing</span>
+                                    <span class="step-date">{{ order.processing_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="status-step {% if order.status == 'PROCESSING' %}active{% else %}pending{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'PROCESSING' %}cog{% else %}clock{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Processing</span>
+                                    <span class="step-date">{% if order.status == 'PROCESSING' %}Processing order{% else %}Pending{% endif %}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Shipped -->
+                            {% if order.shipped_at %}
+                            <div class="status-step {% if order.status == 'SHIPPED' %}active{% else %}completed{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'SHIPPED' %}spinner{% else %}check{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Shipped</span>
+                                    <span class="step-date">{{ order.shipped_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="status-step {% if order.status == 'SHIPPED' %}active{% else %}pending{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'SHIPPED' %}spinner{% else %}clock{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Shipped</span>
+                                    <span class="step-date">{% if order.status == 'SHIPPED' %}In transit{% else %}Pending{% endif %}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Out for Delivery -->
+                            {% if order.out_for_delivery_at %}
+                            <div class="status-step {% if order.status == 'OUT_FOR_DELIVERY' %}active{% else %}completed{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'OUT_FOR_DELIVERY' %}truck{% else %}check{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Out for Delivery</span>
+                                    <span class="step-date">{{ order.out_for_delivery_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="status-step {% if order.status == 'OUT_FOR_DELIVERY' %}active{% else %}pending{% endif %}">
+                                <div class="step-icon"><i class="fas fa-{% if order.status == 'OUT_FOR_DELIVERY' %}truck{% else %}clock{% endif %}"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Out for Delivery</span>
+                                    <span class="step-date">{% if order.status == 'OUT_FOR_DELIVERY' %}On the way{% else %}Pending{% endif %}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Delivered / Cancelled -->
+                            {% if order.status == 'CANCELLED' %}
+                            <div class="status-step cancelled active">
+                                <div class="step-icon"><i class="fas fa-times"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Cancelled</span>
+                                    <span class="step-date">{{ order.cancelled_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% elif order.delivered_at %}
+                            <div class="status-step completed">
+                                <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Delivered</span>
+                                    <span class="step-date">{{ order.delivered_at|date:"M d, Y - h:i A" }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="status-step pending">
+                                <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="step-content">
+                                    <span class="step-title">Delivered</span>
+                                    <span class="step-date">Pending</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Status Update Dropdown -->
+                        
+                    </div>
+                    
+                    <!-- Shipping Information Card -->
+                    <div class="info-card">
+                        <h3><i class="fas fa-map-marker-alt"></i> Shipping Information</h3>
+                        
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value">Aayushman Singh</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Address:</span>
+                                <span class="info-value">Sonari, Jamshedpur 831011</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value">+91 9762424002</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">aayushman.singh@email.com</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Shipping Method:</span>
+                                <span class="info-value">Express Shipping (2-3 business days)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Information Card -->
+                    <div class="info-card">
+                        <h3><i class="fas fa-credit-card"></i> Payment Information</h3>
+                        
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Payment Method:</span>
+                                <span class="info-value">
+                                    <i class="fab fa-cc-visa" style="color: #1a1f71;"></i> 
+                                    Visa ending in 4242
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Payment Status:</span>
+                                <span class="info-value payment-status paid">
+                                    <i class="fas fa-check-circle"></i> Paid
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Transaction ID:</span>
+                                <span class="info-value">TXN-1234-5678-9012</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Paid on:</span>
+                                <span class="info-value">February 14, 2026 at 10:35 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- ===== RIGHT COLUMN - ORDER SUMMARY & ITEMS TABLE ===== -->
+                <div class="order-summary-card">
+                    
+                    <!-- Order Total Summary -->
+                    <div class="summary-header">
+                        <h3>Order Summary</h3>
+                        <div class="total-amount-display">
+                            <span class="total-label">Grand Total:</span>
+                            <span class="total-value">₹{% widthratio order.subtotal 1 1 as sub %}{% widthratio order.tax_amount 1 1 as tax %}{{ order.subtotal|add:order.tax_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Totals Breakdown -->
+                    <div class="totals-breakdown">
+                        <div class="total-row">
+                            <span>Subtotal ({{ order.items.count }} items)</span>
+                            <span>₹{{ order.subtotal }}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Shipping</span>
+                            <span class="free-shipping">Free</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Tax ({{ order.tax_rate }}%)</span>
+                            <span>₹{{ order.tax_amount }}</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span>Grand Total</span>
+                            <span>₹{{ order.subtotal|add:order.tax_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Items Table Title -->
+                    <div class="items-table-header">
+                        <h4><i class="fas fa-box"></i> Order Items</h4>
+                        <span class="item-count">{{ order.items.count }} items</span>
+                    </div>
+                    
+                    <!-- Items Table - No Images, Only Product Names -->
+                    <div class="table-responsive">
+                        <table class="order-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>SKU</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td class="product-name-cell">{{ item.product_name }}</td>
+                                    <td class="sku-cell">SKU-{{ item.product.id }}</td>
+                                    <td class="price-cell">₹{{ item.price }}</td>
+                                    <td class="qty-cell">{{ item.quantity }}</td>
+                                    <td class="total-cell">₹{{ item.line_total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-grand-total">
+                                    <td colspan="4" class="grand-total-label">Grand Total:</td>
+                                    <td class="grand-total-value">₹{{ order.subtotal|add:order.tax_amount }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="order-actions">
+                        <a href="{% url 'shop:products_view' %}" class="btn btn-outline">
+                            <i class="fas fa-shopping-bag"></i>
+                            Shop Again
+                        </a>
+                        <button class="btn btn-primary" id="trackOrderBtn">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Track Order
+                        </button>
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+            <!-- You Might Also Like Section -->
+            <div class="related-section">
+                <h3 class="related-title">You might also like</h3>
+                <div class="related-products">
+                    {% for product in related_products %}
+                    <div class="related-product">
+                        <span class="related-name">{{ product.name }}</span>
+                        <span class="related-price">₹{{ product.price }}</span>
+                    </div>
+                    {% empty %}
+                    <div class="related-product">
+                        <span class="related-name">Leather Wallet</span>
+                        <span class="related-price">₹4,999</span>
+                    </div>
+                    <div class="related-product">
+                        <span class="related-name">Sunglasses</span>
+                        <span class="related-price">₹1,899</span>
+                    </div>
+                    <div class="related-product">
+                        <span class="related-name">Watch</span>
+                        <span class="related-price">₹4,999</span>
+                    </div>
+                    <div class="related-product">
+                        <span class="related-name">Backpack</span>
+                        <span class="related-price">₹2,499</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+        </div>
+    </main>
+    <!-- ===== MAIN ORDER SUMMARY SECTION END ===== -->
+
+    <!-- ===== FOOTER SECTION ===== -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="{% url 'shop:user_home' %}" class="logo">Vibe<span>Cart.</span></a>
+                    <p>Your premier shopping destination for trendy and unique products.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="#">My Account</a></li>
+                        <li><a href="#">Order Tracking</a></li>
+                        <li><a href="#">Wishlist</a></li>
+                        <li><a href="#">Customer Support</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Info</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Rasgulgarh, Bhubaneswar-751010 </p>
+                    <p><i class="fas fa-phone"></i> +91 7455384669</p>
+                    <p><i class="fas fa-envelope"></i> support@vibecart.com</p>
+                    <div class="payment-methods">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fab fa-cc-amex"></i>
+                        <i class="fab fa-cc-paypal"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 VibeCart. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--primary-clr);"></i> for fashion lovers</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
