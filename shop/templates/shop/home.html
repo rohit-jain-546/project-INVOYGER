@@ -69,12 +69,16 @@
 
           <div class="category">
             <img src="{% static 'images/for kids.jpg' %}" />
-            <button>for Kid's</button>
+             <a href="{% url 'shop:kids_view' %}">
+              <button>for Kid's</button>
+            </a>
           </div>
 
           <div class="category">
             <img src="{% static 'images/for accessories.jpg' %}" />
-            <button>Accessories</button>
+            <a href="{% url 'shop:accessory_view' %}">
+              <button>for Accessories</button>
+            </a>
           </div>
 
           <div class="category">

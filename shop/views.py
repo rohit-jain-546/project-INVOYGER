@@ -72,3 +72,13 @@ def Wp_view(request):
 
     context={'products':products}
     return render(request, 'shop/wpd.html', context)
+def accessory_view(request):
+    products = Product.objects.filter(category__in=["AS", "U"])
+
+    context={'products':products}
+    return render(request, 'shop/accessory.html', context)
+def kids_view(request):
+    products = Product.objects.filter(category__in=["K", "U"])
+
+    context={'products':products}
+    return render(request, 'shop/kids.html', context)

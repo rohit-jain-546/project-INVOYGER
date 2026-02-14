@@ -9,4 +9,6 @@ urlpatterns = [
     path('update_cart_item/<int:item_id>/', update_cart_item, name='update_cart_item'),
     path('products/', products_view, name='products_view'),
     path('wpd/', Wp_view, name='Wp_view'),
+    path('accessories/', accessory_view, name='accessory_view'),
+    path('kids/', kids_view, name='kids_view'),
 ]
