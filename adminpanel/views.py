@@ -23,7 +23,9 @@ def admin_home(request):
         product_name = request.POST.get("product_name")
         description = request.POST.get("description")
         price = request.POST.get("price")
-        taxpercent = request.POST.get("taxpercent")
+        category_id = request.POST.get("category")
+
+
         stock = request.POST.get("stock")
         is_active = request.POST.get("is_active") == 'on'
         image = request.FILES.get("image")
@@ -32,7 +34,7 @@ def admin_home(request):
             name=product_name,
             description=description,
             price=price,
-            taxpercent=taxpercent,
+            category=category_id,
             stock=stock,
             is_active=is_active,
             image=image
@@ -104,7 +106,8 @@ def update_product(request, product_id):
         product.name = request.POST.get("product_name")
         product.description = request.POST.get("description")
         product.price = request.POST.get("price")
-        product.taxpercent = request.POST.get("taxpercent")
+        product.category = request.POST.get("category_id")
+        
         product.stock = request.POST.get("stock")
         product.is_active = request.POST.get("is_active") == 'on'
         

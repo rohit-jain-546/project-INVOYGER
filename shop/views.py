@@ -44,15 +44,21 @@ def remove_from_cart(request, item_id):
     return redirect('shop:cart_view')
 
 def update_cart_item(request, item_id):
+    
     if request.method == "POST":
         item = get_object_or_404(cartitem, id=item_id, cart__user=request.user)
         quantity = int(request.POST.get("quantity", 1))
-        item.quantity = quantity
-        item.save()    
+        if quantity <= 0:
+            item.delete()
+        else:
+            item.quantity = quantity
+            item.save()
+           
     return redirect('shop:cart_view')
 
 def products_view(request):
-    products=Product.objects.all()
+    products = Product.objects.filter(category__in=["M", "U"])
+
     context={'products':products}
     return render(request, 'shop/products.html', context)
 
@@ -60,3 +66,9 @@ def public_home(request):
     q=Product.objects.all()[:4]
     context={'products':q}
     return render(request, 'shop/public_home.html', context)
+
+def Wp_view(request):
+    products = Product.objects.filter(category__in=["W", "U"])
+
+    context={'products':products}
+    return render(request, 'shop/wpd.html', context)

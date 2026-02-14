@@ -8,4 +8,5 @@ urlpatterns = [
     path('remove_from_cart/<int:item_id>/', remove_from_cart, name='remove_from_cart'),
     path('update_cart_item/<int:item_id>/', update_cart_item, name='update_cart_item'),
     path('products/', products_view, name='products_view'),
+    path('wpd/', Wp_view, name='Wp_view'),
 ]
