@@ -98,24 +98,25 @@
             </h1>
             <p class="page-subtitle">View and manage all customer orders</p>
           </div>
-          <form method="GET" class="header-actions" style="display:flex; gap:12px;">
+          <form
+            method="GET"
+            class="header-actions"
+            style="display: flex; gap: 12px"
+          >
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                name="q"
+                placeholder="Search orders..."
+                value="{{ request.GET.q }}"
+              />
+            </div>
 
-  <div class="search-box">
-    <i class="fas fa-search"></i>
-    <input
-      type="text"
-      name="q"
-      placeholder="Search orders..."
-      value="{{ request.GET.q }}"
-    >
-  </div>
-
-  <button type="submit" class="btn btn-outline">
-    <i class="fas fa-search"></i>
-  </button>
-
-</form>
-
+            <button type="submit" class="btn btn-outline">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
         </div>
 
         <!-- Filter Bar -->

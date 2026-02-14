@@ -8,6 +8,7 @@ from .models import Product
 from django.contrib import messages
 from orders.models import Order
 from django.core.paginator import Paginator
+from decimal import Decimal
 
 
 from django.db.models import Sum
@@ -143,7 +144,14 @@ def admin_order_detail(request, order_id):
         return redirect('login')
     
     order = Order.objects.get(id=order_id)
-    items = order.items.all()   
+    items = order.items.all()
+    subtotal = sum(item.line_total for item in items)
+    item_count = sum(item.quantity for item in items)
+
+    tax_rate = Decimal('0.18')  # 18% tax
+    tax = subtotal * tax_rate
+
+    grand_total = subtotal + tax   
 
     if request.method == "POST":
         new_status = request.POST.get("status")
@@ -153,7 +161,10 @@ def admin_order_detail(request, order_id):
         return redirect("adminpanel:admin_order_detail", order_id=order.id)
     
     
-    context = {'order': order, 'items': items,"status_choices": Order.ORDER_STATUS_CHOICES}
+    context = {'order': order, 'items': items,"status_choices": Order.ORDER_STATUS_CHOICES,"subtotal": subtotal,
+        "tax": tax,
+        "grand_total": grand_total,
+        "item_count": item_count,}
     return render(request, 'adminpanel/admin_order_detail.html', context)
 
 
