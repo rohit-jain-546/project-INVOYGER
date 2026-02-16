@@ -63,13 +63,13 @@ def order_success(request, order_id):
     if order.status == 'CANCELLED':
         order.cancelled_at = order.created_at
     
-    # Get related products (4 random products excluding items in current order)
-    ordered_product_ids = order.items.values_list('product_id', flat=True)
-    related_products = Product.objects.exclude(id__in=ordered_product_ids)[:4]
+    # # Get related products (4 random products excluding items in current order)
+    # ordered_product_ids = order.items.values_list('product_id', flat=True)
+    # related_products = Product.objects.exclude(id__in=ordered_product_ids)[:4]
     
-    # If not enough products, get any 4 products
-    if related_products.count() < 4:
-        related_products = Product.objects.all()[:4]
+    # # If not enough products, get any 4 products
+    # if related_products.count() < 4:
+    #     related_products = Product.objects.all()[:4]
     
     context = {
         'order': order,
