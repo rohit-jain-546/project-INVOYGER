@@ -118,6 +118,7 @@ App URL: `http://127.0.0.1:8000/`
 
 ## Author
 
-Rohit Jain  
+Rohit Jain  (B.Tech CSE)
+
 LinkedIn: https://www.linkedin.com/in/546-rohit-jain
 
